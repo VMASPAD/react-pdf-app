@@ -1,33 +1,21 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+import './assets/index.css'
+import Start from './components/Versions'
 function App(): JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 
   return (
     <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
+<Tabs defaultValue="Inicio" className="w-screen">
+  <TabsList>
+    <TabsTrigger value="Inicio">Inicio</TabsTrigger>
+    <TabsTrigger value="Editor">Editor</TabsTrigger>
+  </TabsList>
+  <TabsContent value="Inicio" className='border-red-400 border-2 h-screen'><Start /></TabsContent>
+  <TabsContent value="Editor">Editor.</TabsContent>
+</Tabs>
+
     </>
   )
 }
