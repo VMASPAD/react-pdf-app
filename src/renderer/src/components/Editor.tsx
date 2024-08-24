@@ -1,7 +1,39 @@
-import React from 'react'
+// Paso 1: Instalar las dependencias
+// npm install grapesjs @types/grapesjs
 
-export default function Editor() {
+import React, { useEffect, useRef } from 'react';
+import grapesjs from 'grapesjs';
+import 'grapesjs/dist/css/grapes.min.css';
+
+export default function Editor(html: string): JSX.Element {
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      const editor = grapesjs.init({
+        container: editorRef.current,
+        fromElement: true,
+        width: 'auto',
+        storageManager: false,
+        plugins: [],
+      });
+
+      // Opcional: cargar contenido HTML inicial
+      editor.setComponents(html);
+      editor.addComponents({
+        type: 'text',
+        content: 'Este es un texto de ejemplo',
+        style: { color: 'black', fontSize: '20px' },
+      });
+      return () => {
+        editor.destroy();
+      };
+    }
+  }, [html]);
+
   return (
-    <div>Editor</div>
-  )
+    <div ref={editorRef} style={{ height: '500px', border: '1px solid #ccc' }} id='gjss'>
+      <p>Editor</p>
+    </div>
+  );
 }

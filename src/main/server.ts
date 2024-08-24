@@ -1,10 +1,12 @@
 import express from 'express'
 import * as fs from 'fs'
 import * as path from 'path'
+import cors from 'cors'
 
 export default function Server() {
   const server = express()
   const port = 1000
+  server.use(cors())
   const createFolder = (): void => {
     const data = path.join(__dirname, 'data')
     const pdf = path.join(data, 'pdf')
@@ -19,7 +21,7 @@ export default function Server() {
     }
   }
 
-  server.get('/getArchives', (req, res) => {
+  server.get('/getFolders', (req, res) => {
     createFolder()
     const getFolders = (): string[] => {
       return fs.readdirSync(path.join(__dirname, 'data')).filter((file) => {
