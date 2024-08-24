@@ -22,7 +22,7 @@ function Start(): JSX.Element {
           <Button>2</Button>
         </div>
         <div className="flex flex-row w-full p-10 gap-4">
-          <Toggle>Carpeta</Toggle>
+        <Toggle><a href={`/editor`}>Your Name</a></Toggle>
           <Toggle>Carpeta</Toggle>
           <Toggle>Carpeta</Toggle>
           <Toggle>Carpeta</Toggle>

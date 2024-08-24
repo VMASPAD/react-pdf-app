@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import Server from './server'
 
 function createWindow(): void {
   // Create the browser window.
@@ -39,8 +40,9 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  Server()
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.reactpdf')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -69,6 +71,5 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
