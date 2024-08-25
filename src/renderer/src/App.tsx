@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import './assets/index.css'
-import Start from './components/Versions'
+import Start from './components/Start'
 import Editor from './components/Editor'
 function App(): JSX.Element {
   return (

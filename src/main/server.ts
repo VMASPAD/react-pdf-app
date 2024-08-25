@@ -23,6 +23,9 @@ export default function Server() {
 
   server.get('/getFolders', (req, res) => {
     createFolder()
+    const filePath = path.join(__dirname, 'data/html', 'nuevoArchivo.txt')
+    const content = 'Contenido del nuevo archivo'
+    fs.writeFileSync(filePath, content)
     const getFolders = (): string[] => {
       return fs.readdirSync(path.join(__dirname, 'data')).filter((file) => {
         return fs.statSync(path.join(path.join(__dirname, 'data'), file)).isDirectory()
@@ -32,6 +35,15 @@ export default function Server() {
     res.send(folders)
   })
 
+  server.get('/getArchives', (req, res) => {
+    const getArchives = (): string[] => {
+      return fs.readdirSync(path.join(__dirname, 'data\\html')).filter((file) => {
+        return fs.statSync(path.join(path.join(__dirname, 'data\\html'), file)).isFile()
+      })
+    }
+    const archives = getArchives()
+    res.send(archives)
+  })
   server.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })
