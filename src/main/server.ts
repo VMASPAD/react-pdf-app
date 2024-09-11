@@ -23,8 +23,10 @@ export default function Server() {
 
   server.get('/getFolders', (req, res) => {
     createFolder()
-    const filePath = path.join(__dirname, 'data/html', 'nuevoArchivo.txt')
-    const content = 'Contenido del nuevo archivo'
+    const filePath = path.join(__dirname, 'data/html', 'nuevoArchivo.html')
+    const content = `
+  <p>Contenido editable</p>
+`
     fs.writeFileSync(filePath, content)
     const getFolders = (): string[] => {
       return fs.readdirSync(path.join(__dirname, 'data')).filter((file) => {
@@ -43,6 +45,18 @@ export default function Server() {
     }
     const archives = getArchives()
     res.send(archives)
+  })
+  server.get('/view/:filename', (req, res) => {
+    const { filename } = req.params
+    console.log(filename)
+    const filePath = path.join(__dirname, 'data/html', filename)
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf-8')
+      console.log(content)
+      res.send(content)
+    } else {
+      res.status(404).send('Archivo no encontrado')
+    }
   })
   server.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

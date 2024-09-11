@@ -4,9 +4,12 @@
 import React, { useEffect, useRef } from 'react'
 import grapesjs from 'grapesjs'
 import 'grapesjs/dist/css/grapes.min.css'
+import { useLocation } from 'react-router-dom'
 
 export default function Editor(html: string): JSX.Element {
   const editorRef = useRef<HTMLDivElement>(null)
+  const location = useLocation()
+  const { content } = location.state || { content: '' }
 
   useEffect(() => {
     if (editorRef.current) {
@@ -22,7 +25,7 @@ export default function Editor(html: string): JSX.Element {
       editor.setComponents(html)
       editor.addComponents({
         type: 'text',
-        content: html,
+        content: content,
         style: { color: 'black', fontSize: '20px' }
       })
       return () => {
@@ -33,7 +36,7 @@ export default function Editor(html: string): JSX.Element {
 
   return (
     <div ref={editorRef} style={{ height: '500px', border: '1px solid #ccc' }} id="gjss">
-      <p>Editor</p>
+      <p>Editor</p>{content}
     </div>
   )
 }
