@@ -8,6 +8,7 @@ const api = {
   openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),
   copyFile: (filePath) => ipcRenderer.invoke('copy-file', filePath),
   getStoredFiles: () => ipcRenderer.invoke('get-stored-files'),
+  getDirNameFiles: () => ipcRenderer.invoke('get-dirName-files'),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

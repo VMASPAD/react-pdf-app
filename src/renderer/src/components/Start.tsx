@@ -8,22 +8,22 @@ import { Link, useNavigate } from 'react-router-dom'
 function Start(): JSX.Element {
   const [data, setData] = useState<string[]>([])
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
-  const [storedFiles, setStoredFiles] = useState<{ name: string; path: string }[]>([])
+  const [storedFiles, setStoredFiles] = useState([])
   const [fileContent, setFileContent] = useState<string>('')
   const navigate = useNavigate()
   useEffect(() => {
     const fetchStoredFiles = async () => {
-      const files = await window.api.getStoredFiles()
       const folders = await window.api.startFolders()
+      const files = await window.api.getDirNameFiles()
+      console.log(folders)
       setStoredFiles(files)
       setData(folders)
-      console.log(folders)
     }
 
     fetchStoredFiles()
   }, [])
 
-  const handleFileBrowse = async () => {
+  /* const handleFileBrowse = async () => {
     const filePath = await window.api.openFileDialog()
     if (filePath) {
       setSelectedFile(filePath)
@@ -33,7 +33,7 @@ function Start(): JSX.Element {
         setStoredFiles((prevFiles) => [...prevFiles, { name: fileName, path: copiedPath }])
       }
     }
-  }
+  } */
 
   const getDataArchive = async (filename: string) => {
     try {
@@ -59,7 +59,7 @@ function Start(): JSX.Element {
       <div className="flex flex-col w-full h-full">
         <div className="flex flex-row border-b-green-600 border-2 p-10 gap-10 w-full">
           <Input className="w-60" />
-          <Button onClick={handleFileBrowse}>Abrir archivo</Button>
+          {/* <Button onClick={handleFileBrowse}>Abrir archivo</Button> */}
           <Button>2</Button>
         </div>
 
@@ -77,11 +77,11 @@ function Start(): JSX.Element {
                     style={{ maxHeight: 'calc(100vh - 200px)' }}
                   >
                     <div className="grid grid-cols-4 gap-4">
-                      {storedFiles.map((file, index) => (
-                        <div key={index} className="border p-4 text-center">
-                          <p>{file.name}</p>
+                      {storedFiles[index].map((file, fileIndex) => (
+                        <div key={fileIndex} className="border p-4 text-center">
+                          <p>{file}</p>
                           <img src={previewImage} alt="File Preview" className="w-full h-auto" />
-                          <button onClick={() => getDataArchive(file.name)}>Ver</button>
+                          <button onClick={() => getDataArchive(file)}>Ver</button>
                         </div>
                       ))}
                     </div>

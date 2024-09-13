@@ -14,6 +14,7 @@ export default function Server() {
     const { filename } = req.params
     console.log(filename)
     const filePath = path.join(srcApp, 'data/html', filename)
+    console.log(filePath + 'server')
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf-8')
       console.log(content)
@@ -22,6 +23,7 @@ export default function Server() {
       res.status(404).send('Archivo no encontrado')
     }
   })
+
   server.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })

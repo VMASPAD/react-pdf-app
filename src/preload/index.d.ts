@@ -5,6 +5,7 @@ interface api{
   openFileDialog: () => Promise<string>
   copyFile: (filePath: string) => Promise<string>
   getStoredFiles: () => Promise<{ name: string; path: string }[]>
+  getDirNameFiles: () => Promise<string[]>
 }
 
 declare global {

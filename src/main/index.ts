@@ -85,7 +85,7 @@ app.whenReady().then(() => {
     } else {
       console.log(`La carpeta 'data' ya existe.`)
     }
-    return ['PDF', 'HTML']
+    return ['html', 'pdf']
   })
 
   ipcMain.handle('open-file-dialog', async () => {
@@ -139,7 +139,39 @@ app.whenReady().then(() => {
       path: path.join(storageDir, file)
     }))
   })
+  ipcMain.handle('get-dirName-files', async () => {
+    const userDataPath = app.getPath('userData')
+    const storageDir = path.join(userDataPath, 'data')
+    console.log(storageDir)
+    // Ensure the storage directory exists
+    if (!fs.existsSync(storageDir)) {
+      return []
+    }
+    const getHtmlFiles = () => {
+      const htmlDir = path.join(storageDir, 'html');
+      console.log(htmlDir);
+      if (!fs.existsSync(htmlDir)) {
+        return [];
+      }
+      const htmlFiles = fs.readdirSync(htmlDir);
+      console.log(htmlFiles);
+      return htmlFiles;
+    };
 
+    // Función para obtener archivos de la carpeta pdf
+    const getPdfFiles = () => {
+      const pdfDir = path.join(storageDir, 'pdf');
+      console.log(pdfDir);
+      if (!fs.existsSync(pdfDir)) {
+        return [];
+      }
+      const pdfFiles = fs.readdirSync(pdfDir);
+      console.log(pdfFiles);
+      return pdfFiles;
+    };
+    console.log([getHtmlFiles(),getPdfFiles()])
+    return [getHtmlFiles(),getPdfFiles()]
+  })
   createWindow()
 
   app.on('activate', function () {
