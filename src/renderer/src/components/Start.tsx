@@ -14,7 +14,10 @@ function Start(): JSX.Element {
   useEffect(() => {
     const fetchStoredFiles = async () => {
       const files = await window.api.getStoredFiles()
+      const folders = await window.api.startFolders()
       setStoredFiles(files)
+      setData(folders)
+      console.log(folders)
     }
 
     fetchStoredFiles()
@@ -31,20 +34,6 @@ function Start(): JSX.Element {
       }
     }
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://localhost:1000/getFolders')
-        const result = await response.json()
-        setData(result)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-
-    fetchData()
-  }, [])
 
   const getDataArchive = async (filename: string) => {
     try {
@@ -83,7 +72,6 @@ function Start(): JSX.Element {
                 </CollapsibleTrigger>
                 <br />
                 <CollapsibleContent>
-                  {item}
                   <div
                     className="p-10 flex-grow overflow-y-auto"
                     style={{ maxHeight: 'calc(100vh - 200px)' }}
