@@ -1,10 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import path from 'path'
-import Server from './server'
 
 export let srcApp: string
 
@@ -44,7 +43,6 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  Server()
   // Set app user model id for Windows
   electronApp.setAppUserModelId('com.reactpdf')
 
@@ -62,7 +60,7 @@ app.whenReady().then(() => {
   const directoryPath = path.join('C:\\', 'data')
   console.log(directoryPath)
 
-  async function ensureDirectoryExists(dirPath: string) {
+  async function ensureDirectoryExists(dirPath: string): Promise<void> {
     try {
       await fs.promises.access(dirPath)
     } catch (error) {

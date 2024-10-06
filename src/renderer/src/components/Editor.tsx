@@ -1,17 +1,17 @@
 // Paso 1: Instalar las dependencias
 // npm install grapesjs @types/grapesjs
 
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import grapesjs from 'grapesjs'
 import 'grapesjs/dist/css/grapes.min.css'
 import { useLocation } from 'react-router-dom'
 
-export default function Editor(html: string): JSX.Element {
+export default function Editor(): JSX.Element {
   const editorRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
   const { content } = location.state?.content || { content: '' }
   // Función para obtener el parámetro 'data' de la URL
-  const getQueryParam = (param) => {
+  const getQueryParam = (param: string): string | null => {
     const searchParams = new URLSearchParams(location.search)
     return searchParams.get(param)
   }
@@ -29,17 +29,12 @@ export default function Editor(html: string): JSX.Element {
       })
 
       // Opcional: cargar contenido HTML inicial
-      editor.setComponents(html)
-      editor.addComponents({
-        type: 'text',
-        content: data,
-        style: { color: 'black', fontSize: '20px' }
-      })
-      return () => {
+      editor.setComponents(data || '')
+      return (): void => {
         editor.destroy()
       }
     }
-  }, [html])
+  }, [data])
 
   return (
     <div ref={editorRef} style={{ height: '500px', border: '1px solid #ccc' }} id="gjss">

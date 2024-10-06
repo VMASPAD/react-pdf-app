@@ -4,8 +4,8 @@ import { electronAPI } from '@electron-toolkit/preload';
 // Custom APIs for renderer
 const api = {
 
-  getListArchiveHTML: () => ipcRenderer.invoke('start-folders'),
-  getListArchivePDF: () => ipcRenderer.invoke('open-file-dialog'),
+  getListArchiveHTML: (): Promise<string[]> => ipcRenderer.invoke('start-folders'),
+  getListArchivePDF: (): Promise<string[]> => ipcRenderer.invoke('open-file-dialog'),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to
