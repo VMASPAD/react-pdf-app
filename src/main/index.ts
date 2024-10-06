@@ -59,118 +59,70 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
 
   // Handle the file dialog
+  const directoryPath = path.join('C:\\', 'data')
+  console.log(directoryPath)
 
-  ipcMain.handle('start-folders', async () => {
-    const userDataPath = app.getPath('userData')
-    const data = path.join(userDataPath, 'data')
-    srcApp = userDataPath
-    const pdf = path.join(data, 'pdf')
-    const html = path.join(data, 'html')
-    if (!fs.existsSync(data)) {
-      fs.mkdirSync(data)
-      fs.mkdirSync(pdf)
-      fs.mkdirSync(html)
-      const contenido = 'Hola, este es el contenido del archivo.';
-
-      // Crear y escribir en el archivo
-      fs.writeFile(`${html}/archivo.html`, contenido, (err) => {
-        if (err) {
-          console.error('Error al crear el archivo:', err);
-        } else {
-          console.log('Archivo creado exitosamente.');
-        }
-      });
-
-      console.log(`Carpeta 'data' creada exitosamente.`)
-    } else {
-      console.log(`La carpeta 'data' ya existe.`)
+  async function ensureDirectoryExists(dirPath: string) {
+    try {
+      await fs.promises.access(dirPath)
+    } catch (error) {
+      await fs.promises.mkdir(dirPath, { recursive: true })
     }
-    return ['html', 'pdf']
-  })
+  }
 
-  ipcMain.handle('open-file-dialog', async () => {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'HTML Files', extensions: ['html'] }]
-    })
+  // Asegurarse de que la carpeta 'data' exista
+  ensureDirectoryExists(directoryPath).catch(console.error)
 
-    if (canceled) return null
-    return filePaths[0] // Return the selected file path to the renderer
-  })
-
-  // Handle the file copying logic
-  ipcMain.handle('copy-file', async (event, originalPath) => {
-    if (!originalPath) return null
-
-    // Get the user data path for storing the copied file
-    const userDataPath = app.getPath('userData')
-    const storageDir = path.join(userDataPath, 'PDFEditor')
-
-    // Ensure the storage directory exists
-    if (!fs.existsSync(storageDir)) {
-      fs.mkdirSync(storageDir, { recursive: true })
-    }
-
-    const fileName = path.basename(originalPath)
-    const destPath = path.join(storageDir, fileName)
+  ipcMain.handle('getListArchiveHTML', async () => {
+    const htmlDir = path.join(directoryPath, 'html')
+    await ensureDirectoryExists(htmlDir)
 
     try {
-      // Copy the file and return the new path
-      fs.copyFileSync(originalPath, destPath)
-      return destPath
+      const files = await fs.promises.readdir(htmlDir)
+      const htmlFiles = files.filter((file) => path.extname(file) === '.html')
+
+      const result = await Promise.all(
+        htmlFiles.map(async (file) => {
+          const filePath = path.join(htmlDir, file)
+          const content = await fs.promises.readFile(filePath, 'utf-8')
+          return {
+            'nameArchive': file,
+            'contentArchive': content
+          }
+        })
+      )
+
+      return result
     } catch (error) {
-      console.error('Error copying file:', error)
-      return null
+      console.error('Error reading directory:', error)
+      throw error
     }
   })
 
-  ipcMain.handle('get-stored-files', async () => {
-    const userDataPath = app.getPath('userData')
-    const storageDir = path.join(userDataPath, 'data')
-    console.log(storageDir)
-    // Ensure the storage directory exists
-    if (!fs.existsSync(storageDir)) {
-      return []
-    }
+  ipcMain.handle('getListArchivePDF', async () => {
+    const pdfDir = path.join(directoryPath, 'pdf')
+    await ensureDirectoryExists(pdfDir)
 
-    const files = fs.readdirSync(storageDir)
-    return files.map((file) => ({
-      name: file,
-      path: path.join(storageDir, file)
-    }))
-  })
-  ipcMain.handle('get-dirName-files', async () => {
-    const userDataPath = app.getPath('userData')
-    const storageDir = path.join(userDataPath, 'data')
-    console.log(storageDir)
-    // Ensure the storage directory exists
-    if (!fs.existsSync(storageDir)) {
-      return []
-    }
-    const getHtmlFiles = () => {
-      const htmlDir = path.join(storageDir, 'html');
-      console.log(htmlDir);
-      if (!fs.existsSync(htmlDir)) {
-        return [];
-      }
-      const htmlFiles = fs.readdirSync(htmlDir);
-      console.log(htmlFiles);
-      return htmlFiles;
-    };
+    try {
+      const files = await fs.promises.readdir(pdfDir)
+      const pdfFiles = files.filter((file) => path.extname(file) === '.pdf')
 
-    // Función para obtener archivos de la carpeta pdf
-    const getPdfFiles = () => {
-      const pdfDir = path.join(storageDir, 'pdf');
-      console.log(pdfDir);
-      if (!fs.existsSync(pdfDir)) {
-        return [];
-      }
-      const pdfFiles = fs.readdirSync(pdfDir);
-      console.log(pdfFiles);
-      return pdfFiles;
-    };
-    console.log([getHtmlFiles(),getPdfFiles()])
-    return [getHtmlFiles(),getPdfFiles()]
+      const result = await Promise.all(
+        pdfFiles.map(async (file) => {
+          const filePath = path.join(pdfDir, file)
+          const content = await fs.promises.readFile(filePath, 'utf-8')
+          return {
+            'nameArchive': file,
+            'contentArchive': content
+          }
+        })
+      )
+
+      return result
+    } catch (error) {
+      console.error('Error reading directory:', error)
+      throw error
+    }
   })
   createWindow()
 

@@ -1,49 +1,25 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import previewImage from '../assets/hmtl_logo.png'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
+type File = {
+  contentArchive: string
+  nameArchive: string
+}
 function Start(): JSX.Element {
-  const [data, setData] = useState<string[]>([])
-  const [selectedFile, setSelectedFile] = useState<string | null>(null)
-  const [storedFiles, setStoredFiles] = useState([])
-  const [fileContent, setFileContent] = useState<string>('')
-  const navigate = useNavigate()
-  useEffect(() => {
-    const fetchStoredFiles = async () => {
-      const folders = await window.api.startFolders()
-      const files = await window.api.getDirNameFiles()
-      console.log(folders)
-      setStoredFiles(files)
-      setData(folders)
-    }
+  const [htmlFiles, setHtmlFiles] = useState<File[]>([])
+  const [pdfFiles, setPdfFiles] = useState<File[]>([])
 
-    fetchStoredFiles()
-  }, [])
+  const handleGetHtmlFiles = async (): Promise<void> => {
+    const files = await window.electron.ipcRenderer.invoke('getListArchiveHTML')
+    setHtmlFiles(files)
+  }
 
-  /* const handleFileBrowse = async () => {
-    const filePath = await window.api.openFileDialog()
-    if (filePath) {
-      setSelectedFile(filePath)
-      const copiedPath = await window.api.copyFile(filePath)
-      if (copiedPath) {
-        const fileName = copiedPath.split(/[\\/]/).pop() || copiedPath // Handle both \ and /
-        setStoredFiles((prevFiles) => [...prevFiles, { name: fileName, path: copiedPath }])
-      }
-    }
-  } */
-
-  const getDataArchive = async (filename: string) => {
-    try {
-      const response = await fetch(`http://localhost:1000/view/${filename}`)
-      const content = await response.text()
-      setFileContent(content)
-      navigate('/editor', { state: { content } }) // Navegar y pasar el contenido del archivo
-    } catch (error) {
-      console.error('Error fetching file content:', error)
-    }
+  const handleGetPdfFiles = async (): Promise<void> => {
+    const files = await window.electron.ipcRenderer.invoke('getListArchivePDF')
+    setPdfFiles(files)
   }
   return (
     <div className="flex h-screen">
@@ -59,36 +35,41 @@ function Start(): JSX.Element {
       <div className="flex flex-col w-full h-full">
         <div className="flex flex-row border-b-green-600 border-2 p-10 gap-10 w-full">
           <Input className="w-60" />
-          {/* <Button onClick={handleFileBrowse}>Abrir archivo</Button> */}
           <Button>2</Button>
         </div>
 
         <div className="p-10">
-          <Collapsible className="w-[350px] space-y-2">
-            {data.map((item, index) => (
-              <div key={index}>
-                <CollapsibleTrigger>
-                  <p className="text-red-400">{item.toUpperCase()}</p>
-                </CollapsibleTrigger>
-                <br />
-                <CollapsibleContent>
-                  <div
-                    className="p-10 flex-grow overflow-y-auto"
-                    style={{ maxHeight: 'calc(100vh - 200px)' }}
-                  >
-                    <div className="grid grid-cols-4 gap-4">
-                      {storedFiles[index].map((file, fileIndex) => (
-                        <div key={fileIndex} className="border p-4 text-center">
-                          <p>{file}</p>
-                          <img src={previewImage} alt="File Preview" className="w-full h-auto" />
-                          <button onClick={() => getDataArchive(file)}>Ver</button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CollapsibleContent>
-              </div>
-            ))}
+          <Collapsible>
+            <CollapsibleTrigger>HTML</CollapsibleTrigger>
+            <CollapsibleContent>
+              <Button onClick={handleGetHtmlFiles}>Obtener Archivos HTML</Button>
+              <ul>
+                {htmlFiles.map((file, index) => (
+                  <>
+                    <Link to={'/editor?data=' + file.contentArchive} key={index}>
+                      {file.nameArchive}
+                    </Link>
+                    <br />
+                  </>
+                ))}
+              </ul>
+            </CollapsibleContent>
+          </Collapsible>
+          <Collapsible>
+            <CollapsibleTrigger>PDF</CollapsibleTrigger>
+            <CollapsibleContent>
+              <Button onClick={handleGetPdfFiles}>Obtener Archivos PDF</Button>
+              <ul>
+                {pdfFiles.map((file, index) => (
+                  <>
+                    <Link to={'/editor?data=' + file.contentArchive} key={index}>
+                      {file.nameArchive}
+                    </Link>
+                    <br />
+                  </>
+                ))}
+              </ul>
+            </CollapsibleContent>
           </Collapsible>
         </div>
       </div>

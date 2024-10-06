@@ -4,11 +4,8 @@ import { electronAPI } from '@electron-toolkit/preload';
 // Custom APIs for renderer
 const api = {
 
-  startFolders: () => ipcRenderer.invoke('start-folders'),
-  openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),
-  copyFile: (filePath) => ipcRenderer.invoke('copy-file', filePath),
-  getStoredFiles: () => ipcRenderer.invoke('get-stored-files'),
-  getDirNameFiles: () => ipcRenderer.invoke('get-dirName-files'),
+  getListArchiveHTML: () => ipcRenderer.invoke('start-folders'),
+  getListArchivePDF: () => ipcRenderer.invoke('open-file-dialog'),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

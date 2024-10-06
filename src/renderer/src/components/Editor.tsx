@@ -9,8 +9,15 @@ import { useLocation } from 'react-router-dom'
 export default function Editor(html: string): JSX.Element {
   const editorRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
-  const { content } = location.state || { content: '' }
+  const { content } = location.state?.content || { content: '' }
+  // Función para obtener el parámetro 'data' de la URL
+  const getQueryParam = (param) => {
+    const searchParams = new URLSearchParams(location.search)
+    return searchParams.get(param)
+  }
 
+  const data = getQueryParam('data')
+  console.log(data)
   useEffect(() => {
     if (editorRef.current) {
       const editor = grapesjs.init({
@@ -25,7 +32,7 @@ export default function Editor(html: string): JSX.Element {
       editor.setComponents(html)
       editor.addComponents({
         type: 'text',
-        content: content,
+        content: data,
         style: { color: 'black', fontSize: '20px' }
       })
       return () => {
@@ -36,7 +43,7 @@ export default function Editor(html: string): JSX.Element {
 
   return (
     <div ref={editorRef} style={{ height: '500px', border: '1px solid #ccc' }} id="gjss">
-      <p>Editor</p>{content}
+      {content}
     </div>
   )
 }
