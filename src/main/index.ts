@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -84,8 +84,8 @@ app.whenReady().then(() => {
           const filePath = path.join(htmlDir, file)
           const content = await fs.promises.readFile(filePath, 'utf-8')
           return {
-            'nameArchive': file,
-            'contentArchive': content
+            nameArchive: file,
+            contentArchive: content
           }
         })
       )
@@ -110,8 +110,8 @@ app.whenReady().then(() => {
           const filePath = path.join(pdfDir, file)
           const content = await fs.promises.readFile(filePath, 'utf-8')
           return {
-            'nameArchive': file,
-            'contentArchive': content
+            nameArchive: file,
+            contentArchive: content
           }
         })
       )
@@ -123,6 +123,104 @@ app.whenReady().then(() => {
     }
   })
   createWindow()
+
+  ipcMain.handle('open-file-dialog', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile', 'multiSelections'],
+      filters: [
+        { name: 'HTML Files', extensions: ['html'] },
+        { name: 'PDF Files', extensions: ['pdf'] }
+      ]
+    })
+    return result.filePaths
+  })
+
+  // Guardar archivos localmente
+  ipcMain.handle('save-file', async (event, filePath, destination) => {
+    const fileName = path.basename(filePath)
+    const destPath = path.join(destination, fileName)
+
+    try {
+      // Ensure the destination folder exists
+      await ensureDirectoryExists(destination)
+
+      // Copy file to the destination directory
+      await fs.promises.copyFile(filePath, destPath)
+
+      console.log(`File copied to ${destPath}`)
+      return destPath
+    } catch (error) {
+      console.error(`Error copying file: ${error}`)
+      throw error
+    } // Aca tendria que haber un result para notificar al usuario con una notificacion de que el archivo se subio correctamente. Ver cual libreria usamos para ese componente.
+  })
+
+  //Funcion para enviar archivo, esperar conversion remota y guardarlo localmente
+
+  const handleFileConversion = async (filePath: string): Promise<void> => {
+    console.log('Inside handleFileConversion function');
+  
+    const url = 'http://localhost:4000/convert'; // Remote server URL
+    
+    // Log the full filePath for debugging
+    console.log('filePath:', filePath);
+  
+    // Create the body to send only filePath
+    const body = {
+      filePath  // Send filePath which contains both content and file name
+    };
+  
+    // Send request to the server
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body) // Send data as JSON
+    });
+  
+    if (!response.ok) {
+      throw new Error('Conversion failed');
+    }
+  
+    // Get the response data
+    const convertedFile = await response.json(); // Assuming the server sends back the same format
+  
+    // Log the converted content for debugging
+    console.log('Converted File:', convertedFile);
+  
+    // Now save the converted file (assuming convertedFile contains both the new content and filename)
+    const { filePath: newFilePath, fileName: newFileName } = convertedFile;
+  
+    // Determine where to save the file based on the new file extension
+    const fileExtension = newFileName.split('.').pop(); // Extract the file extension
+  
+    let newFullPath;
+    if (fileExtension === 'pdf') {
+      // Save in the PDF folder
+      newFullPath = `C:/data/pdf/${newFileName}`;
+    } else if (fileExtension === 'html') {
+      // Save in the HTML folder
+      newFullPath = `C:/data/html/${newFileName}`;
+    } else {
+      throw new Error('Unsupported file type');
+    }
+  
+    // Save the file
+    fs.writeFileSync(newFullPath, newFilePath, 'utf8');
+    console.log(`File saved at ${newFullPath}`);
+  };
+
+  // IPC handler para accionar conversion de archivo
+  ipcMain.handle('convert-file', async (event, filePath, fileName) => {
+    console.log('estoy en el ipc handler')
+
+    try {
+      const convertedFilePath = await handleFileConversion(filePath, fileName)
+      return { success: true, convertedFilePath }
+    } catch (error) {
+      console.error('File conversion error:', error)
+      return { success: false, error: error.message }
+    }
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

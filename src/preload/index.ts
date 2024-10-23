@@ -1,12 +1,29 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
+const fs = require('fs');
 
 // Custom APIs for renderer
 const api = {
-
-  getListArchiveHTML: (): Promise<string[]> => ipcRenderer.invoke('start-folders'),
-  getListArchivePDF: (): Promise<string[]> => ipcRenderer.invoke('open-file-dialog'),
+  openFileDialog: (): Promise<string[]> => ipcRenderer.invoke('open-file-dialog'),
+  openFileInEditor: (filePath: string): Promise<void> => ipcRenderer.invoke('open-file-in-editor', filePath),
+  
+  saveFile: (filePath: string, content: string): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      fs.writeFile(filePath, content, (err) => {
+        if (err) {
+          console.error('File saving error:', err);
+          reject(err);
+        } else {
+          console.log('File saved successfully:', filePath);
+          resolve(true);
+        }
+      });
+    });
+  },
+  convertFile: (filePath: string): Promise<{ success: boolean; convertedFilePath?: string; error?: string }> => 
+    ipcRenderer.invoke('convert-file', filePath),
 };
+
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
