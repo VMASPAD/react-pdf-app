@@ -29,7 +29,7 @@ export default function Editor(): JSX.Element {
       })
 
       // Opcional: cargar contenido HTML inicial
-      editor.setComponents(data || '')
+      editor.setComponents(localStorage.getItem('archive') || '')
       return (): void => {
         editor.destroy()
       }

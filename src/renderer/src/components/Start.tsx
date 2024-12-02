@@ -17,6 +17,7 @@ function Start(): JSX.Element {
 
   const handleGetHtmlFiles = async (): Promise<void> => {
     const files = await window.electron.ipcRenderer.invoke('getListArchiveHTML')
+    console.log(files)
     setHtmlFiles(files)
   }
 
@@ -76,34 +77,31 @@ function Start(): JSX.Element {
   // Funcion para guardar archivos en directorios de pdf o html localmente
   const saveFiles = async (files: File[], destination: string) => {
     for (const file of files) {
-      await window.electron.ipcRenderer.invoke('save-file', file.contentArchive, destination) 
+      await window.electron.ipcRenderer.invoke('save-file', file.contentArchive, destination)
     }
   }
 
-  // Funcion para conversion de archivos 
+  // Funcion para conversion de archivos
   const handleFileClickConvert = async (file: File) => {
     try {
       // Extract file path from the clicked file
       const filePath = file.contentArchive // File content or path
       const fileName = file.nameArchive
-
       if (!filePath || !fileName) {
         alert('Invalid file selected.')
         return
       }
 
-      console.log('File selected:', filePath, fileName)
-
       // Send the file path to the backend for conversion
       const result = await window.electron.ipcRenderer.invoke('convert-file', {
-        filePath,
-        fileName
+        filePath: filePath,
+        fileName: fileName
       })
-
       // Check if the conversion was successful
       if (result.success) {
         alert(`Archivo convertido exitosamente!`)
       } else {
+        console.log(result.error)
         alert(`Conversion fallida: ${result.error}`)
       }
     } catch (error) {
@@ -191,7 +189,12 @@ function Start(): JSX.Element {
                   <div className="modal">
                     <div className="modal-content">
                       <h3>¿Qué deseas hacer con el archivo {selectedFile.nameArchive}?</h3>
-                      <Link to={`/editor?data=${selectedFile.contentArchive}`}>
+                      <Link
+                        to={
+                          `/editor?data=${selectedFile.contentArchive}` &&
+                          localStorage.setItem('archive', selectedFile.contentArchive)
+                        }
+                      >
                         <button className="modal-button">Abrir en el editor</button>
                       </Link>
                       <button

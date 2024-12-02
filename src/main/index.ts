@@ -157,64 +157,70 @@ app.whenReady().then(() => {
 
   //Funcion para enviar archivo, esperar conversion remota y guardarlo localmente
 
-  const handleFileConversion = async (filePath: string): Promise<void> => {
-    console.log('Inside handleFileConversion function');
-  
-    const url = 'http://localhost:4000/convert'; // Remote server URL
-    
+  const handleFileConversion = async (fileName: string): Promise<void> => {
+    console.log('Inside handleFileConversion function')
+
+    const url = 'http://localhost:4000/convertHtml' // Remote server URL
+
     // Log the full filePath for debugging
-    console.log('filePath:', filePath);
-  
-    // Create the body to send only filePath
-    const body = {
-      filePath  // Send filePath which contains both content and file name
-    };
-  
+    console.log('filePath:', fileName['fileName'])
+
+    // Create a FormData object
+
     // Send request to the server
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body) // Send data as JSON
-    });
-  
+      body: JSON.stringify({ file: fileName['fileName'] }) // Send FormData
+    })
+
+    // Check response status
     if (!response.ok) {
-      throw new Error('Conversion failed');
+      console.log('Response:', response.text())
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
-  
-    // Get the response data
-    const convertedFile = await response.json(); // Assuming the server sends back the same format
-  
+
+    const result = await response.json()
+    console.log('Response:', result)
+
+    if (!response.ok) {
+      throw new Error('Conversion failed')
+    }
+
+    /*    // Get the response data
+    const convertedFile = await response.json() // Assuming the server sends back the same format
+
     // Log the converted content for debugging
-    console.log('Converted File:', convertedFile);
-  
+    console.log('Converted File:', convertedFile)
+
     // Now save the converted file (assuming convertedFile contains both the new content and filename)
-    const { filePath: newFilePath, fileName: newFileName } = convertedFile;
-  
+    const { filePath: newFilePath, fileName: newFileName } = convertedFile
+
     // Determine where to save the file based on the new file extension
-    const fileExtension = newFileName.split('.').pop(); // Extract the file extension
-  
-    let newFullPath;
+    const fileExtension = newFileName.split('.').pop() // Extract the file extension
+
+    let newFullPath
     if (fileExtension === 'pdf') {
       // Save in the PDF folder
-      newFullPath = `C:/data/pdf/${newFileName}`;
+      newFullPath = `C:/data/pdf/${newFileName}`
     } else if (fileExtension === 'html') {
       // Save in the HTML folder
-      newFullPath = `C:/data/html/${newFileName}`;
+      newFullPath = `C:/data/html/${newFileName}`
     } else {
-      throw new Error('Unsupported file type');
+      throw new Error('Unsupported file type')
     }
-  
+
     // Save the file
-    fs.writeFileSync(newFullPath, newFilePath, 'utf8');
-    console.log(`File saved at ${newFullPath}`);
-  };
+    fs.writeFileSync(newFullPath, newFilePath, 'utf8')
+    console.log(`File saved at ${newFullPath}`) */
+  }
 
   // IPC handler para accionar conversion de archivo
   ipcMain.handle('convert-file', async (event, filePath, fileName) => {
     console.log('estoy en el ipc handler')
 
     try {
-      const convertedFilePath = await handleFileConversion(filePath, fileName)
+      const convertedFilePath = await handleFileConversion(filePath)
       return { success: true, convertedFilePath }
     } catch (error) {
       console.error('File conversion error:', error)

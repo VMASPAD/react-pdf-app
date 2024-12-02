@@ -6,7 +6,7 @@ const fs = require('fs');
 const api = {
   openFileDialog: (): Promise<string[]> => ipcRenderer.invoke('open-file-dialog'),
   openFileInEditor: (filePath: string): Promise<void> => ipcRenderer.invoke('open-file-in-editor', filePath),
-  
+
   saveFile: (filePath: string, content: string): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       fs.writeFile(filePath, content, (err) => {
@@ -20,7 +20,7 @@ const api = {
       });
     });
   },
-  convertFile: (filePath: string): Promise<{ success: boolean; convertedFilePath?: string; error?: string }> => 
+  convertFile: (filePath: string): Promise<{ success: boolean; convertedFilePath?: string; error?: string }> =>
     ipcRenderer.invoke('convert-file', filePath),
 };
 
