@@ -157,26 +157,27 @@ app.whenReady().then(() => {
 
   //Funcion para enviar archivo, esperar conversion remota y guardarlo localmente
 
-  const handleFileConversion = async (fileName: string): Promise<void> => {
-    console.log('Inside handleFileConversion function')
+  const handleFileConversion = async (fileName: { fileName: string }): Promise<void> => {
 
-    const url = 'http://localhost:4000/convertHtml' // Remote server URL
 
-    // Log the full filePath for debugging
-    console.log('filePath:', fileName['fileName'])
+    const html = 'http://localhost:4000/convertHtml' // Remote server URL
+    const pdf = 'http://localhost:4000/convertPdf' // Remote server URL
 
-    // Create a FormData object
+    // Determine the URL based on file extension
+    const fileExtension = fileName.fileName.split('.').pop()?.toLowerCase()
+    const conversionUrl = fileExtension === 'html' ? pdf : html
+    console.log(conversionUrl)
 
     // Send request to the server
-    const response = await fetch(url, {
+    const response = await fetch(conversionUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ file: fileName['fileName'] }) // Send FormData
+      body: JSON.stringify({ file: fileName.fileName }) // Send filename
     })
 
     // Check response status
     if (!response.ok) {
-      console.log('Response:', response.text())
+      console.log('Response:', await response.text())
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
