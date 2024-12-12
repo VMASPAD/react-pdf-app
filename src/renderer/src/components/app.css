@@ -1,0 +1,19 @@
+.tab-properties {
+    border:  2px solid transparent; /* Gray border with 2px width */
+    border-radius: 10px 10px 0 0; /* Rounded top-left and top-right corners */
+    background: rgb(209, 213, 219); /* Default background color */
+    height: 40px;
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+  }
+  
+  .tab-properties:hover {
+    background: rgb(107, 114, 128); /* Darker gray on hover */
+    color: white; /* Change text/icon color on hover */
+    
+  }
+  
+  .tab-properties[data-state='active'] {
+    background: rgb(31, 41, 55); /* Dark background when active */
+    border-radius: 10px 10px 10px 10px;
+    color: white; /* Text/icon color for the active tab */
+  }

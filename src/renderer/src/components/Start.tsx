@@ -113,7 +113,8 @@ function Start(): JSX.Element {
   return (
     <div>
       <div className="flex h-screen">
-        <div className="border-r-green-600 border-2 w-52 flex flex-col items-center">
+        {/* Sidebar Izquierda */}
+        <div className="mt-12 fixed top-0 left-0 h-screen border-r-green-600 border-2 w-52 flex flex-col items-center bg-white z-10">
           <ul className="flex flex-col items-center w-full overflow-auto">
             <li className="mb-10 bg-slate-400 w-full text-center">Recientes</li>
             <li className="mb-10 w-full text-center">Herramientas</li>
@@ -122,13 +123,14 @@ function Start(): JSX.Element {
           </ul>
         </div>
 
-        <div className="flex flex-col w-full h-full">
-          <div className="flex flex-row border-b-green-600 border-2 p-10 gap-10 w-full">
+        {/* Sidebar Arriba */}
+        <div className="ml-52 flex flex-col w-full h-full">
+          <div className="mt-12 fixed top-0 left-52 right-0 h-16 border-b-2 border-green-600 bg-white z-10 p-4 flex items-center gap-4">
             <Input className="w-60" />
             <Button onClick={handleFileSelect}>Subir archivo</Button>
           </div>
-
-          <div className="p-10">
+          {/* Contenido */}
+          <div className="p-10 mt-14">
             <Collapsible>
               <CollapsibleTrigger>HTML</CollapsibleTrigger>
               <CollapsibleContent>
