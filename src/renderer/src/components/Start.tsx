@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Link } from 'react-router-dom'
+import { FaFilePdf, FaHtml5 } from 'react-icons/fa'
 
 type File = {
   contentArchive: string
@@ -109,7 +110,10 @@ function Start(): JSX.Element {
       alert('Un error ocurrio durante la conversion.')
     }
   }
-
+  useEffect(() => {
+    handleGetHtmlFiles()
+    handleGetPdfFiles()
+  }, [])
   return (
     <div>
       <div className="flex h-screen">
@@ -130,31 +134,25 @@ function Start(): JSX.Element {
             <Button onClick={handleFileSelect}>Subir archivo</Button>
           </div>
           {/* Contenido */}
-          <div className="p-10 mt-14">
+          <div className="p-10 mt-14 grid grid-rows-2 gap-5">
             <Collapsible>
               <CollapsibleTrigger>HTML</CollapsibleTrigger>
               <CollapsibleContent>
-                <Button onClick={handleGetHtmlFiles}>Obtener Archivos HTML</Button>
-                <ul>
+                <div className="flex flex-row gap-5 items-center">
                   {htmlFiles.map((file, index) => (
-                    <li
-                      key={index}
-                      onClick={() => handleFileClick(file)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {file.nameArchive}
-                    </li>
+                    <div key={index} className="flex flex-col gap-2 items-center">
+                      <FaHtml5 className="fill-orange-500" size={50} />
+                      <Button onClick={() => handleFileClick(file)}>View {file.nameArchive}</Button>
+                    </div>
                   ))}
-                </ul>
+                </div>
 
                 {/* Pop-up Modal */}
                 {isModalOpen && selectedFile && (
                   <div className="modal">
                     <div className="modal-content">
                       <h3>¿Qué deseas hacer con el archivo {selectedFile.nameArchive}?</h3>
-                      <Link to={`/editor?data=${selectedFile.contentArchive}`}>
-                        <button className="modal-button">Abrir en el editor</button>
-                      </Link>
+                      <a href={`C:\\data\\pdf\\entrada.pdf`}>Abrir en el editor</a>
                       <button
                         className="modal-button"
                         onClick={() => handleFileClickConvert(selectedFile!)}
@@ -173,18 +171,14 @@ function Start(): JSX.Element {
             <Collapsible>
               <CollapsibleTrigger>PDF</CollapsibleTrigger>
               <CollapsibleContent>
-                <Button onClick={handleGetPdfFiles}>Obtener Archivos PDF</Button>
-                <ul>
+                <div className="flex flex-row gap-5 items-center">
                   {pdfFiles.map((file, index) => (
-                    <li
-                      key={index}
-                      onClick={() => handleFileClick(file)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {file.nameArchive}
-                    </li>
+                    <div key={index} className="flex flex-col gap-2 items-center">
+                      <FaFilePdf className="fill-red-500" size={50} />
+                      <Button onClick={() => handleFileClick(file)}>View {file.nameArchive}</Button>
+                    </div>
                   ))}
-                </ul>
+                </div>
 
                 {/* Pop-up Modal */}
                 {isModalOpen && selectedFile && (
@@ -198,6 +192,13 @@ function Start(): JSX.Element {
                         }
                       >
                         <button className="modal-button">Abrir en el editor</button>
+                      </Link>
+                      <Link
+                        to={
+                          `/preview`
+                        }
+                      >
+                        <button className="modal-button">Preview</button>
                       </Link>
                       <button
                         className="modal-button"

@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Editor from './components/Editor'
+import Preview from './components/Preview'
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: '/view/:filename',
     element: <Editor />,
+  },
+  {
+    path: '/preview',
+    element: <Preview />,
   }
 ])
 
