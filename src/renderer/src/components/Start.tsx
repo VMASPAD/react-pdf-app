@@ -193,11 +193,7 @@ function Start(): JSX.Element {
                       >
                         <button className="modal-button">Abrir en el editor</button>
                       </Link>
-                      <Link
-                        to={
-                          `/preview`
-                        }
-                      >
+                      <Link to={`/preview/${selectedFile.nameArchive}`} key={selectedFile.nameArchive} state={{ pdfUrl: selectedFile.nameArchive }}>
                         <button className="modal-button">Preview</button>
                       </Link>
                       <button

@@ -1,13 +1,18 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import pypdf2htmlEX
 import os
 import shutil
 from pyppeteer import launch
 import nest_asyncio
 from playwright.sync_api import sync_playwright
+from flask_cors import CORS
 
 nest_asyncio.apply()
 app = Flask(__name__)
+CORS(app)
+UPLOAD_FOLDER = 'C:/data/pdf/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 @app.route('/convertHtml', methods=['POST'])
 def convert_pdf_to_html():
@@ -63,5 +68,17 @@ def convert_html_to_pdf():
     else:
         return jsonify({"error": "Formato de archivo inválido, solo se permiten archivos HTML"}), 400
 
+@app.route('/previewPdf/<path:filename>')
+def serve_file(filename):
+    """
+    Sirve archivos desde el directorio especificado bajo el prefijo /files.
+    """
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    if not os.path.exists(file_path):
+        return jsonify({"error": "Archivo no encontrado"}), 404
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 if __name__ == '__main__':
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Crea la carpeta si no existe
+    print(f"Servidor iniciado. Coloca tus archivos en: {os.path.abspath(UPLOAD_FOLDER)}")
     app.run(debug=True, port=4000)

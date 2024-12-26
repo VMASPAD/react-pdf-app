@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Editor from './components/Editor'
-import Preview from './components/Preview'
+import { ViewPDF } from './components/ViewPDF'
 
 const router = createBrowserRouter([
   {
@@ -20,9 +20,9 @@ const router = createBrowserRouter([
     element: <Editor />,
   },
   {
-    path: '/preview',
-    element: <Preview />,
-  }
+    path: '/preview/:nameArchive',
+    element: <ViewPDF />,
+  },
 ])
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
