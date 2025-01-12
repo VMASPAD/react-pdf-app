@@ -5,6 +5,7 @@ import App from './App'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Editor from './components/Editor'
 import { ViewPDF } from './components/ViewPDF'
+import Notes from './components/Notes'
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
   {
     path: '/editor',
     element: <Editor />
+  },
+  {
+    path: '/notes',
+    element: <Notes />
   },
   {
     path: '/view/:filename',

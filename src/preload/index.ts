@@ -1,6 +1,6 @@
-import { contextBridge, ipcRenderer } from 'electron';
-import { electronAPI } from '@electron-toolkit/preload';
-const fs = require('fs');
+import { contextBridge, ipcRenderer } from 'electron'
+import { electronAPI } from '@electron-toolkit/preload'
+const fs = require('fs')
 
 // Custom APIs for renderer
 const api = {
@@ -11,33 +11,34 @@ const api = {
     return new Promise((resolve, reject) => {
       fs.writeFile(filePath, content, (err) => {
         if (err) {
-          console.error('File saving error:', err);
-          reject(err);
+          console.error('File saving error:', err)
+          reject(err)
         } else {
-          console.log('File saved successfully:', filePath);
-          resolve(true);
+          console.log('File saved successfully:', filePath)
+          resolve(true)
         }
-      });
-    });
+      })
+    })
   },
-  convertFile: (filePath: string): Promise<{ success: boolean; convertedFilePath?: string; error?: string }> =>
-    ipcRenderer.invoke('convert-file', filePath),
-};
-
+  convertFile: (
+    filePath: string
+  ): Promise<{ success: boolean; convertedFilePath?: string; error?: string }> =>
+    ipcRenderer.invoke('convert-file', filePath)
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld('electron', electronAPI);
-    contextBridge.exposeInMainWorld('api', api);
+    contextBridge.exposeInMainWorld('electron', electronAPI)
+    contextBridge.exposeInMainWorld('api', api)
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
 } else {
   // @ts-ignore (define in dts)
-  window.electron = electronAPI;
+  window.electron = electronAPI
   // @ts-ignore (define in dts)
-  window.api = api;
+  window.api = api
 }

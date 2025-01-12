@@ -123,7 +123,7 @@ function Start(): JSX.Element {
             <li className="mb-10 bg-slate-400 w-full text-center">Recientes</li>
             <li className="mb-10 w-full text-center">Herramientas</li>
             <li className="mb-10 w-full text-center">Preferencias</li>
-            <li className="mb-10 w-full text-center">Anotaciones</li>
+            <li className="mb-10 w-full text-center"><Link to={'/notes'}>Anotaciones</Link></li>
           </ul>
         </div>
 
@@ -152,7 +152,9 @@ function Start(): JSX.Element {
                   <div className="modal">
                     <div className="modal-content">
                       <h3>¿Qué deseas hacer con el archivo {selectedFile.nameArchive}?</h3>
-                      <a href={`C:\\data\\pdf\\entrada.pdf`}>Abrir en el editor</a>
+                      <Link to={`/editor?data=${selectedFile.contentArchive}`}>
+                        <button className="modal-button">Abrir en el editor</button>
+                      </Link>
                       <button
                         className="modal-button"
                         onClick={() => handleFileClickConvert(selectedFile!)}

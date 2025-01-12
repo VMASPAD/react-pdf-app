@@ -5,7 +5,6 @@ import { useEffect, useRef } from 'react'
 import grapesjs from 'grapesjs'
 import 'grapesjs/dist/css/grapes.min.css'
 import { useLocation } from 'react-router-dom'
-
 export default function Editor(): JSX.Element {
   const editorRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
