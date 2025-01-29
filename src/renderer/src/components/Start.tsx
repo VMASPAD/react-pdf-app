@@ -4,6 +4,21 @@ import { Input } from '@/components/ui/input'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Link } from 'react-router-dom'
 import { FaFilePdf, FaHtml5 } from 'react-icons/fa'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
 
 type File = {
   contentArchive: string
@@ -27,21 +42,8 @@ function Start(): JSX.Element {
     setPdfFiles(files)
   }
 
-  // Abrir modal con el archivo seleccionado
-  const handleFileClick = (file: File) => {
-    setSelectedFile(file)
-    setIsModalOpen(true)
-  }
-
-  // Cerrar modal
-  const closeModal = () => {
-    setIsModalOpen(false)
-    setSelectedFile(null)
-  }
-
   // Funcion para manejar seleccion de archivos (Mostrar html en archivos html y pdf en archivos pdf en la interfaz home)
   const handleFileSelect = async () => {
-    console.log('estoy en la funcion de seleccion')
 
     // Open the file dialog
     const selectedFiles: string[] = await window.electron.ipcRenderer.invoke('open-file-dialog')
@@ -118,137 +120,112 @@ function Start(): JSX.Element {
     <div>
       <div className="flex h-screen">
         {/* Sidebar Izquierda */}
-        <div className="mt-12 fixed top-0 left-0 h-screen border-r-green-600 border-2 w-52 flex flex-col items-center bg-white z-10">
+        <div className="mt-12 fixed top-0 left-0 h-screen border-r-gray-200 border-2 w-52 flex flex-col items-center bg-white z-10">
           <ul className="flex flex-col items-center w-full overflow-auto">
-            <li className="mb-10 bg-slate-400 w-full text-center">Recientes</li>
-            <li className="mb-10 w-full text-center">Herramientas</li>
-            <li className="mb-10 w-full text-center">Preferencias</li>
-            <li className="mb-10 w-full text-center"><Link to={'/notes'}>Anotaciones</Link></li>
+            <li className="mb-10 rounded-lg p-2 text-center hover:bg-slate-300 transition-colors duration-300">
+              <Link to={'/notes'}>Anotaciones</Link>
+            </li>
           </ul>
         </div>
 
         {/* Sidebar Arriba */}
         <div className="ml-52 flex flex-col w-full h-full">
-          <div className="mt-12 fixed top-0 left-52 right-0 h-16 border-b-2 border-green-600 bg-white z-10 p-4 flex items-center gap-4">
+          <div className="mt-12 fixed top-0 left-52 right-0 h-16 border-b-2 border-gray-200 bg-white z-10 p-4 flex items-center gap-4">
             <Input className="w-60" />
             <Button onClick={handleFileSelect}>Subir archivo</Button>
           </div>
           {/* Contenido */}
+
           <div className="p-10 mt-14 grid grid-rows-2 gap-5">
-            <Collapsible>
-              <CollapsibleTrigger>HTML</CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="flex flex-row gap-5 items-center">
-                  {htmlFiles.map((file, index) => (
-                    <div key={index} className="flex flex-col gap-2 items-center">
-                      <FaHtml5 className="fill-orange-500" size={50} />
-                      <Button onClick={() => handleFileClick(file)}>View {file.nameArchive}</Button>
-                    </div>
-                  ))}
-                </div>
+            <Accordion type="single" collapsible>
+              <AccordionItem value="HTML">
+                <AccordionTrigger>HTML</AccordionTrigger>
+                <AccordionContent>
+                  <div className="flex flex-row gap-5 items-center">
+                    {htmlFiles.map((file, index) => (
+                      <div key={index} className="flex flex-col gap-2 items-center">
+                        <FaHtml5 className="fill-orange-500" size={50} />
 
-                {/* Pop-up Modal */}
-                {isModalOpen && selectedFile && (
-                  <div className="modal">
-                    <div className="modal-content">
-                      <h3>¿Qué deseas hacer con el archivo {selectedFile.nameArchive}?</h3>
-                      <Link to={`/editor?data=${selectedFile.contentArchive}`}>
-                        <button className="modal-button">Abrir en el editor</button>
-                      </Link>
-                      <button
-                        className="modal-button"
-                        onClick={() => handleFileClickConvert(selectedFile!)}
-                      >
-                        Convertir HTML a PDF
-                      </button>
-                      <button className="close-button" onClick={closeModal}>
-                        Cerrar
-                      </button>
-                    </div>
+                        <Dialog>
+                          <DialogTrigger>View {file.nameArchive}</DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                <p className="text-2xl">{file.nameArchive}</p>
+                              </DialogTitle>
+                              <DialogDescription>
+                                <p>Que desea hacer?</p>
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                              <Button>Ver {file.nameArchive}</Button>
+                              <Link to={`/editor?data=${selectedFile?.contentArchive}`}>
+                                <Button> Abrir en el editor</Button>
+                              </Link>
+                              <Button onClick={() => handleFileClickConvert(selectedFile!)}>
+                                Convertir HTML a PDF
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </CollapsibleContent>
-            </Collapsible>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
 
-            <Collapsible>
-              <CollapsibleTrigger>PDF</CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="flex flex-row gap-5 items-center">
-                  {pdfFiles.map((file, index) => (
-                    <div key={index} className="flex flex-col gap-2 items-center">
-                      <FaFilePdf className="fill-red-500" size={50} />
-                      <Button onClick={() => handleFileClick(file)}>View {file.nameArchive}</Button>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Pop-up Modal */}
-                {isModalOpen && selectedFile && (
-                  <div className="modal">
-                    <div className="modal-content">
-                      <h3>¿Qué deseas hacer con el archivo {selectedFile.nameArchive}?</h3>
-                      <Link
-                        to={
-                          `/editor?data=${selectedFile.contentArchive}` &&
-                          localStorage.setItem('archive', selectedFile.contentArchive)
-                        }
-                      >
-                        <button className="modal-button">Abrir en el editor</button>
-                      </Link>
-                      <Link to={`/preview/${selectedFile.nameArchive}`} key={selectedFile.nameArchive} state={{ pdfUrl: selectedFile.nameArchive }}>
-                        <button className="modal-button">Preview</button>
-                      </Link>
-                      <button
-                        className="modal-button"
-                        onClick={() => handleFileClickConvert(selectedFile!)}
-                      >
-                        Convertir PDF a HTML
-                      </button>
-                      <button className="close-button" onClick={closeModal}>
-                        Cerrar
-                      </button>
-                    </div>
+            <Accordion type="single" collapsible>
+              <AccordionItem value="PDF">
+                <AccordionTrigger>PDF</AccordionTrigger>
+                <AccordionContent>
+                  <div className="flex flex-row gap-5 items-center">
+                    {pdfFiles.map((file, index) => (
+                      <div key={index} className="flex flex-col gap-2 items-center">
+                        <FaFilePdf className="fill-red-500" size={50} />
+                        <Dialog>
+                          <DialogTrigger>View {file.nameArchive}</DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>{file.nameArchive}</DialogTitle>
+                              <DialogDescription>
+                                This action cannot be undone. This will permanently delete your
+                                account and remove your data from our servers.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                              <Link
+                                to={
+                                  `/editor?data=${selectedFile?.contentArchive}` &&
+                                  localStorage.setItem('archive', selectedFile?.contentArchive)
+                                }
+                              >
+                                <Button className="modal-button">Abrir en el editor</Button>
+                              </Link>
+                              <Link
+                                to={`/preview/${selectedFile?.nameArchive}`}
+                                key={selectedFile?.nameArchive}
+                                state={{ pdfUrl: selectedFile?.nameArchive }}
+                              >
+                                <Button>Preview</Button>
+                              </Link>
+                              <Button onClick={() => handleFileClickConvert(selectedFile!)}>
+                                Convertir PDF a HTML
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </CollapsibleContent>
-            </Collapsible>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </div>
 
       {/* Basic styles for the modal */}
-      <style jsx>{`
-        .modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .modal-content {
-          background-color: white;
-          padding: 20px;
-          border-radius: 5px;
-          text-align: center;
-          border: 1px solid black; /* 1px border for modal */
-        }
-        .modal-button {
-          padding: 5px;
-          margin: 5px;
-          border: 1px solid black; /* 1px border for buttons */
-        }
-        .close-button {
-          padding: 5px;
-          margin: 5px;
-          background-color: red; /* Red background for the close button */
-          color: white; /* White text for contrast */
-          border: 1px solid black; /* 1px border for the close button */
-        }
-      `}</style>
     </div>
   )
 }

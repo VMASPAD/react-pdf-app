@@ -23,7 +23,12 @@ export default function Editor(): JSX.Element {
         container: editorRef.current,
         fromElement: true,
         width: 'auto',
-        storageManager: false,
+        storageManager: {
+          type: 'local',// o 'indexeddb' como referencia
+          autosave: true,
+          autoload: true,
+          stepsBeforeSave: 1,
+        },
         plugins: []
       })
 
@@ -36,7 +41,7 @@ export default function Editor(): JSX.Element {
   }, [data])
 
   return (
-    <div ref={editorRef} style={{ height: '500px', border: '1px solid #ccc' }} id="gjss">
+    <div ref={editorRef} className='w-full !h-screen' id="gjss">
       {content}
     </div>
   )

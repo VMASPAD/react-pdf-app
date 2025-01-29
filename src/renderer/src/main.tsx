@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Editor from './components/Editor'
 import { ViewPDF } from './components/ViewPDF'
 import Notes from './components/Notes'
+import Tools from './components/Tools'
 
 const router = createBrowserRouter([
   {

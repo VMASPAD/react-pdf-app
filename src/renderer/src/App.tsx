@@ -42,7 +42,7 @@ function App(): JSX.Element {
   }
 
   return (
-    <div className="w-screen h-screen flex flex-col">
+    <div className="w-full h-screen flex flex-col">
       <div className="flex flex-col w-full">
         <div className="flex flex-col w-full">
           <Tabs

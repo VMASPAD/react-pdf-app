@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
+import { Link } from 'react-router-dom';
 
 // Initialize the database
 const db = new Dexie('NotesDB');
@@ -72,7 +73,9 @@ const Notes: React.FC = () => {
   return (
     <div className="p-4 max-w-xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Notes</h1>
-
+      <p>
+              <Link to={'/'}>Volver al editor</Link>
+              </p>
       <div className="mb-4">
         <Input
           type="text"
@@ -154,7 +157,7 @@ const Notes: React.FC = () => {
                           ></Textarea>
                           <Button
                             onClick={updateNote}
-                            className="mt-2 px-4 py-2 bg-green-500 text-white font-semibold rounded shadow hover:bg-green-600"
+                            className="mt-2 px-4 py-2 bg-gray-200 text-white font-semibold rounded shadow hover:bg-green-600"
                           >
                             Save
                           </Button>
